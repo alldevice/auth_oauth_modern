@@ -257,6 +257,7 @@ class OAuthModernController(Home):  # Inherit from Home instead of http.Controll
                     'oauth_uid': oauth_uid,
                     'oauth_access_token': tokens.get('access_token'),
                     'oauth_refresh_token': tokens.get('refresh_token'),
+                    'oauth_enabled': True,  # Ensure OAuth is enabled
                 }
                 # Only update company if user doesn't have one
                 if not user.company_id:
@@ -285,6 +286,7 @@ class OAuthModernController(Home):  # Inherit from Home instead of http.Controll
                 'oauth_uid': oauth_uid,
                 'oauth_access_token': tokens.get('access_token'),
                 'oauth_refresh_token': tokens.get('refresh_token'),
+                'oauth_enabled': True,  # Ensure OAuth is enabled
                 'active': True,
                 'company_id': default_company.id if default_company else False,
                 'company_ids': [(4, default_company.id)] if default_company else False,
@@ -301,11 +303,15 @@ class OAuthModernController(Home):  # Inherit from Home instead of http.Controll
             
             user = Users.create(user_vals)
         else:
-            # Update tokens
+            # Update tokens for existing users with OAuth already linked
             user.write({
                 'oauth_access_token': tokens.get('access_token'),
                 'oauth_refresh_token': tokens.get('refresh_token'),
+                'oauth_enabled': True,  # Ensure OAuth is enabled
             })
+        
+        # Ensure the user is committed to the database before returning
+        request.env.cr.commit()
         
         return user.login
     

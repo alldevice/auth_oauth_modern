@@ -75,23 +75,32 @@ class ResUsers(models.Model):
     def _check_credentials(self, password, user_agent_env):
         """Override to allow OAuth token as password"""
         try:
+            # First try regular password authentication
             return super()._check_credentials(password, user_agent_env)
         except AccessDenied:
-            # Check if password is actually an OAuth access token
+            # If regular auth fails, check if it's an OAuth token
             user = self.sudo().search([
                 ('id', '=', self.env.uid),
-                ('oauth_access_token', '=', password),
                 ('oauth_enabled', '=', True)
-            ])
-            if user and user.oauth_access_token == password:
+            ], limit=1)
+            
+            if not user:
+                raise
+            
+            # Check if the password matches the stored OAuth access token
+            if user.oauth_access_token and user.oauth_access_token == password:
                 # Check token expiry if set
                 if user.oauth_token_expiry:
                     if fields.Datetime.now() > user.oauth_token_expiry:
                         # Try to refresh token
                         if user.oauth_refresh_token and user._refresh_oauth_token():
+                            # Token refreshed successfully
                             return
                         raise AccessDenied(_("OAuth token expired"))
+                # Token is valid
                 return
+            
+            # If we get here, neither password nor OAuth token worked
             raise
     
     @api.model
