@@ -131,6 +131,10 @@ class ResUsers(models.Model):
             if not email:
                 raise AccessDenied(_("Email is required to create user"))
             
+            # Get default company
+            Company = self.env['res.company'].sudo()
+            default_company = Company.search([], limit=1, order='sequence, id')
+            
             # Create new user
             values = {
                 'name': oauth_response.get('name', email.split('@')[0]),
@@ -140,11 +144,18 @@ class ResUsers(models.Model):
                 'oauth_uid': oauth_uid,
                 'oauth_enabled': True,
                 'password': '',  # No password for OAuth-only users
+                'company_id': default_company.id if default_company else False,
+                'company_ids': [(4, default_company.id)] if default_company else False,
             }
             
             # Add default groups
             if provider.default_groups:
                 values['groups_id'] = [(6, 0, provider.default_groups.ids)]
+            else:
+                # Set default internal user group if no groups specified
+                internal_user_group = self.env.ref('base.group_user', raise_if_not_found=False)
+                if internal_user_group:
+                    values['groups_id'] = [(6, 0, [internal_user_group.id])]
             
             user = self.sudo().create(values)
         

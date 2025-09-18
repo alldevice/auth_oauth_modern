@@ -252,17 +252,30 @@ class OAuthModernController(Home):  # Inherit from Home instead of http.Controll
             
             if user:
                 # Link existing user to OAuth provider
-                user.write({
+                update_vals = {
                     'oauth_provider_id': provider.id,
                     'oauth_uid': oauth_uid,
                     'oauth_access_token': tokens.get('access_token'),
                     'oauth_refresh_token': tokens.get('refresh_token'),
-                })
+                }
+                # Only update company if user doesn't have one
+                if not user.company_id:
+                    Company = request.env['res.company'].sudo()
+                    default_company = Company.search([], limit=1, order='sequence, id')
+                    if default_company:
+                        update_vals['company_id'] = default_company.id
+                        update_vals['company_ids'] = [(4, default_company.id)]
+                
+                user.write(update_vals)
         
         if not user:
             # Create new user
             if not email:
                 raise UserError(_("Email address is required to create a new user"))
+            
+            # Get default company
+            Company = request.env['res.company'].sudo()
+            default_company = Company.search([], limit=1, order='sequence, id')
             
             user_vals = {
                 'name': user_info.get('name') or email.split('@')[0],
@@ -273,11 +286,18 @@ class OAuthModernController(Home):  # Inherit from Home instead of http.Controll
                 'oauth_access_token': tokens.get('access_token'),
                 'oauth_refresh_token': tokens.get('refresh_token'),
                 'active': True,
+                'company_id': default_company.id if default_company else False,
+                'company_ids': [(4, default_company.id)] if default_company else False,
             }
             
             # Set default groups if configured
             if provider.default_groups:
                 user_vals['groups_id'] = [(6, 0, provider.default_groups.ids)]
+            else:
+                # Set default internal user group if no groups specified
+                internal_user_group = request.env.ref('base.group_user', raise_if_not_found=False)
+                if internal_user_group:
+                    user_vals['groups_id'] = [(6, 0, [internal_user_group.id])]
             
             user = Users.create(user_vals)
         else:
