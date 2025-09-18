@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- OAuth Provider Form View -->
+    <record id="view_auth_oauth_provider_form" model="ir.ui.view">
+        <field name="name">auth.oauth.provider.form</field>
+        <field name="model">auth.oauth.provider</field>
+        <field name="arch" type="xml">
+            <form string="OAuth Provider">
+                <header>
+                    <button name="test_connection" type="object" string="Test Connection" 
+                            class="btn-primary" attrs="{'invisible': [('active', '=', False)]}"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_copy_redirect_uri" type="object" 
+                                class="oe_stat_button" icon="fa-copy">
+                            <div class="o_stat_info">
+                                <span class="o_stat_text">Copy Redirect URI</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <widget name="web_ribbon" title="Inactive" 
+                            attrs="{'invisible': [('active', '=', True)]}"/>
+                    
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Provider Name"/>
+                        </h1>
+                    </div>
+                    
+                    <group>
+                        <group string="Basic Configuration">
+                            <field name="active"/>
+                            <field name="sequence"/>
+                            <field name="provider_type"/>
+                            <field name="flow_type"/>
+                        </group>
+                        <group string="OAuth Credentials">
+                            <field name="client_id" password="True" 
+                                   placeholder="Your OAuth Application Client ID"/>
+                            <field name="client_secret" password="True" 
+                                   placeholder="Your OAuth Application Client Secret (if required)"/>
+                            <field name="redirect_uri" readonly="1"/>
+                            <div colspan="2" class="alert alert-info">
+                                <i class="fa fa-info-circle"/> Copy the Redirect URI above and paste it 
+                                in your OAuth provider's application configuration.
+                            </div>
+                        </group>
+                    </group>
+                    
+                    <notebook>
+                        <page string="Endpoints" name="endpoints">
+                            <group>
+                                <group string="Required Endpoints">
+                                    <field name="auth_endpoint" 
+                                           placeholder="https://provider.com/oauth/authorize"/>
+                                    <field name="token_endpoint" 
+                                           placeholder="https://provider.com/oauth/token"/>
+                                    <field name="userinfo_endpoint" 
+                                           placeholder="https://provider.com/oauth/userinfo"/>
+                                </group>
+                                <group string="Optional Endpoints">
+                                    <field name="logout_endpoint" 
+                                           placeholder="https://provider.com/oauth/logout"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-warning" role="alert">
+                                <h4>Endpoint Configuration Help</h4>
+                                <p><strong>Authentik:</strong></p>
+                                <ul>
+                                    <li>Authorization: https://your-authentik.com/application/o/your-app/authorize/</li>
+                                    <li>Token: https://your-authentik.com/application/o/token/</li>
+                                    <li>UserInfo: https://your-authentik.com/application/o/userinfo/</li>
+                                </ul>
+                                
+                                <p><strong>Keycloak:</strong></p>
+                                <ul>
+                                    <li>Base: https://your-keycloak.com/realms/your-realm</li>
+                                    <li>Append: /protocol/openid-connect/auth (authorize)</li>
+                                    <li>Append: /protocol/openid-connect/token</li>
+                                    <li>Append: /protocol/openid-connect/userinfo</li>
+                                </ul>
+                            </div>
+                        </page>
+                        
+                        <page string="Scopes &amp; Claims" name="scopes">
+                            <group>
+                                <group string="OAuth Scopes">
+                                    <field name="scope" 
+                                           placeholder="openid profile email"/>
+                                </group>
+                                <group string="User Field Mapping">
+                                    <field name="user_id_field" 
+                                           placeholder="sub"/>
+                                    <field name="email_field" 
+                                           placeholder="email"/>
+                                    <field name="name_field" 
+                                           placeholder="name"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-info">
+                                <p>Map the JSON fields from your OAuth provider's UserInfo response 
+                                   to Odoo user fields. Common mappings:</p>
+                                <ul>
+                                    <li><strong>sub, id, uid</strong> → User ID</li>
+                                    <li><strong>email, mail</strong> → Email</li>
+                                    <li><strong>name, display_name</strong> → Name</li>
+                                </ul>
+                            </div>
+                        </page>
+                        
+                        <page string="User Settings" name="users">
+                            <group>
+                                <group string="User Creation">
+                                    <field name="auto_create_user"/>
+                                    <field name="default_groups" 
+                                           widget="many2many_tags"
+                                           attrs="{'invisible': [('auto_create_user', '=', False)]}"/>
+                                </group>
+                                <group string="Authentication">
+                                    <field name="auth_prompt"/>
+                                </group>
+                            </group>
+                        </page>
+                        
+                        <page string="Display" name="display">
+                            <group>
+                                <group string="Login Button">
+                                    <field name="button_text" 
+                                           placeholder="Sign in with Provider"/>
+                                    <field name="button_icon" 
+                                           placeholder="fa-key"/>
+                                    <field name="button_css_class" 
+                                           placeholder="btn-primary"/>
+                                </group>
+                            </group>
+                            
+                            <div class="alert alert-info">
+                                <p><strong>Icon Examples:</strong></p>
+                                <ul>
+                                    <li>fa-google (Google)</li>
+                                    <li>fa-microsoft (Microsoft/Azure)</li>
+                                    <li>fa-github (GitHub)</li>
+                                    <li>fa-key (Generic)</li>
+                                    <li>fa-lock (Security)</li>
+                                </ul>
+                                <p><strong>CSS Class Examples:</strong></p>
+                                <ul>
+                                    <li>btn-primary (Blue)</li>
+                                    <li>btn-success (Green)</li>
+                                    <li>btn-warning (Yellow)</li>
+                                    <li>btn-oauth-google (Google style)</li>
+                                    <li>btn-oauth-azure (Azure style)</li>
+                                </ul>
+                            </div>
+                        </page>
+                    </notebook>
+                </sheet>
+            </form>
+        </field>
+    </record>
+    
+    <!-- OAuth Provider Tree View -->
+    <record id="view_auth_oauth_provider_tree" model="ir.ui.view">
+        <field name="name">auth.oauth.provider.tree</field>
+        <field name="model">auth.oauth.provider</field>
+        <field name="arch" type="xml">
+            <tree string="OAuth Providers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="provider_type"/>
+                <field name="flow_type"/>
+                <field name="client_id"/>
+                <field name="active" widget="boolean_toggle"/>
+            </tree>
+        </field>
+    </record>
+    
+    <!-- OAuth Provider Search View -->
+    <record id="view_auth_oauth_provider_search" model="ir.ui.view">
+        <field name="name">auth.oauth.provider.search</field>
+        <field name="model">auth.oauth.provider</field>
+        <field name="arch" type="xml">
+            <search string="OAuth Providers">
+                <field name="name"/>
+                <field name="provider_type"/>
+                <filter string="Active" name="active" 
+                        domain="[('active', '=', True)]"/>
+                <filter string="Inactive" name="inactive" 
+                        domain="[('active', '=', False)]"/>
+                <separator/>
+                <filter string="Authorization Code" name="auth_code" 
+                        domain="[('flow_type', 'in', ['authorization_code', 'authorization_code_pkce'])]"/>
+                <filter string="Implicit Flow" name="implicit" 
+                        domain="[('flow_type', '=', 'implicit')]"/>
+                <group expand="0" string="Group By">
+                    <filter string="Provider Type" name="group_provider_type" 
+                            context="{'group_by': 'provider_type'}"/>
+                    <filter string="Flow Type" name="group_flow_type" 
+                            context="{'group_by': 'flow_type'}"/>
+                    <filter string="Active" name="group_active" 
+                            context="{'group_by': 'active'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+    
+    <!-- Action for OAuth Providers -->
+    <record id="action_auth_oauth_provider" model="ir.actions.act_window">
+        <field name="name">OAuth Providers</field>
+        <field name="res_model">auth.oauth.provider</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_auth_oauth_provider_search"/>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Create your first OAuth Provider
+            </p>
+            <p>
+                Configure OAuth 2.0 providers to allow users to login using external identity providers
+                like Authentik, Keycloak, Google, Azure AD, etc.
+            </p>
+        </field>
+    </record>
+    
+    <!-- Menu Items -->
+    <menuitem id="menu_auth_oauth_providers"
+              name="OAuth Providers"
+              parent="base.menu_users"
+              action="action_auth_oauth_provider"
+              sequence="20"/>
+</odoo>
