@@ -3,27 +3,8 @@
     <!-- Extend the login template to add OAuth buttons -->
     <template id="auth_oauth_modern_login" inherit_id="web.login" name="OAuth Modern Login">
         <xpath expr="//form[@class='oe_login_form']" position="inside">
-            <!-- Add OAuth providers section after the login form -->
-            <div class="o_oauth_modern_providers mt-3" t-if="oauth_providers">
-                <div class="o_login_separator my-3">
-                    <span>or</span>
-                </div>
-                <t t-foreach="oauth_providers" t-as="provider">
-                    <a t-attf-href="/auth_oauth_modern/signin?provider=#{provider.id}&amp;redirect=#{redirect or '/web'}"
-                       t-attf-class="btn btn-block mb-2 #{provider.button_css_class or 'btn-secondary'}"
-                       t-if="provider.active">
-                        <i t-if="provider.button_icon" t-attf-class="fa #{provider.button_icon} mr-2"/>
-                        <span t-esc="provider.button_text"/>
-                    </a>
-                </t>
-            </div>
-        </xpath>
-    </template>
-    
-    <!-- Add CSS for OAuth buttons -->
-    <template id="auth_oauth_modern_assets" inherit_id="web.assets_frontend">
-        <xpath expr="." position="inside">
-            <style>
+            <!-- Add inline styles -->
+            <style type="text/css">
                 .o_oauth_modern_providers {
                     text-align: center;
                 }
@@ -67,43 +48,22 @@
                     height: 1px;
                     background: #ddd;
                 }
-                
-                /* Provider-specific styles */
-                .btn-oauth-google {
-                    background: #4285f4;
-                    color: white;
-                    border: none;
-                }
-                
-                .btn-oauth-google:hover {
-                    background: #357ae8;
-                    color: white;
-                }
-                
-                .btn-oauth-azure {
-                    background: #0078d4;
-                    color: white;
-                    border: none;
-                }
-                
-                .btn-oauth-github {
-                    background: #24292e;
-                    color: white;
-                    border: none;
-                }
-                
-                .btn-oauth-authentik {
-                    background: #fd4b00;
-                    color: white;
-                    border: none;
-                }
-                
-                .btn-oauth-keycloak {
-                    background: #008aaa;
-                    color: white;
-                    border: none;
-                }
             </style>
+            
+            <!-- Add OAuth providers section after the login form -->
+            <div class="o_oauth_modern_providers mt-3" t-if="oauth_providers">
+                <div class="o_login_separator my-3">
+                    <span>or</span>
+                </div>
+                <t t-foreach="oauth_providers" t-as="provider">
+                    <a t-attf-href="/auth_oauth_modern/signin?provider=#{provider.id}&amp;redirect=#{redirect or '/web'}"
+                       t-attf-class="btn btn-block mb-2 #{provider.button_css_class or 'btn-secondary'}"
+                       t-if="provider.active">
+                        <i t-if="provider.button_icon" t-attf-class="fa #{provider.button_icon} mr-2"/>
+                        <span t-esc="provider.button_text"/>
+                    </a>
+                </t>
+            </div>
         </xpath>
     </template>
 </odoo>
