@@ -11,11 +11,12 @@ from odoo import http, _
 from odoo.http import request
 from odoo.exceptions import AccessDenied, UserError
 from odoo.addons.web.controllers.utils import ensure_db
+from odoo.addons.web.controllers.home import Home  # Import the Home controller
 
 _logger = logging.getLogger(__name__)
 
 
-class OAuthModernController(http.Controller):
+class OAuthModernController(Home):  # Inherit from Home instead of http.Controller
     """Handles OAuth 2.0 Authorization Code Flow with PKCE"""
     
     def _generate_pkce_pair(self):
@@ -320,9 +321,11 @@ class OAuthModernController(http.Controller):
     @http.route('/web/login', type='http', auth='none', sitemap=False)
     def web_login(self, redirect=None, **kw):
         """Override login page to add OAuth providers"""
-        response = super(OAuthModernController, self).web_login(redirect=redirect, **kw)
+        # Call parent method (from Home controller)
+        response = super().web_login(redirect=redirect, **kw)
         
-        if response.qcontext:
+        # Check if response has qcontext (it's a rendered template response)
+        if hasattr(response, 'qcontext'):
             # Add OAuth providers to the login page context
             providers = request.env['auth.oauth.provider'].sudo().search([
                 ('active', '=', True)
