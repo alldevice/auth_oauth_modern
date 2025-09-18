@@ -1,4 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Stub file - views will be added later -->
+    <record id="view_oauth_provider_form" model="ir.ui.view">
+        <field name="name">auth.oauth.provider.form</field>
+        <field name="model">auth.oauth.provider</field>
+        <field name="arch" type="xml">
+            <form string="OAuth Provider">
+                <sheet>
+                    <group>
+                        <group string="Provider Information">
+                            <field name="name"/>
+                            <field name="active"/>
+                            <field name="provider_type"/>
+                            <field name="flow_type"/>
+                            <field name="sequence"/>
+                        </group>
+                        <group string="OAuth Credentials">
+                            <field name="client_id"/>
+                            <field name="client_secret" password="True"/>
+                            <field name="redirect_uri" readonly="1"/>
+                        </group>
+                    </group>
+                    <group string="OAuth Endpoints">
+                        <field name="auth_endpoint"/>
+                        <field name="token_endpoint"/>
+                        <field name="userinfo_endpoint"/>
+                        <field name="logout_endpoint"/>
+                    </group>
+                    <group>
+                        <group string="Configuration">
+                            <field name="scope"/>
+                            <field name="auth_prompt"/>
+                            <field name="auto_create_user"/>
+                            <field name="default_groups" widget="many2many_tags"/>
+                        </group>
+                        <group string="Field Mapping">
+                            <field name="user_id_field"/>
+                            <field name="email_field"/>
+                            <field name="name_field"/>
+                        </group>
+                    </group>
+                    <group string="Display">
+                        <field name="button_text"/>
+                        <field name="button_icon"/>
+                        <field name="button_css_class"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="test_connection" type="object" string="Test Connection" class="btn-primary"/>
+                    <button name="action_copy_redirect_uri" type="object" string="Copy Redirect URI"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_oauth_provider_tree" model="ir.ui.view">
+        <field name="name">auth.oauth.provider.tree</field>
+        <field name="model">auth.oauth.provider</field>
+        <field name="arch" type="xml">
+            <tree string="OAuth Providers">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="provider_type"/>
+                <field name="flow_type"/>
+                <field name="active"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="action_oauth_provider" model="ir.actions.act_window">
+        <field name="name">OAuth Providers (Modern)</field>
+        <field name="res_model">auth.oauth.provider</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem id="menu_oauth_providers"
+              name="OAuth Providers (Modern)"
+              parent="base.menu_users"
+              action="action_oauth_provider"
+              sequence="30"/>
 </odoo>

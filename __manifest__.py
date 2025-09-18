@@ -30,6 +30,7 @@
         'data/auth_oauth_data.xml',
         'views/auth_oauth_provider_views.xml',
         'views/res_users_views.xml',
+        'views/login_template.xml',
     ],
     'external_dependencies': {
         'python': ['requests', 'secrets', 'hashlib', 'base64'],

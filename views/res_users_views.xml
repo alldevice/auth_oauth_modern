@@ -1,4 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Stub file - views will be added later -->
+    <record id="view_users_form_oauth_modern" model="ir.ui.view">
+        <field name="name">res.users.form.oauth.modern</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <notebook position="inside">
+                <page string="OAuth Modern" groups="base.group_system">
+                    <group>
+                        <group string="OAuth Configuration">
+                            <field name="oauth_provider_id"/>
+                            <field name="oauth_uid"/>
+                            <field name="oauth_enabled"/>
+                            <field name="force_oauth_login"/>
+                        </group>
+                        <group string="OAuth Status">
+                            <field name="oauth_last_sync"/>
+                            <field name="oauth_token_expiry"/>
+                        </group>
+                    </group>
+                    <footer>
+                        <button name="action_sync_oauth_info" type="object" string="Sync OAuth Info" class="btn-primary"/>
+                        <button name="action_unlink_oauth" type="object" string="Unlink OAuth" class="btn-danger" confirm="Are you sure you want to unlink OAuth?"/>
+                    </footer>
+                </page>
+            </notebook>
+        </field>
+    </record>
 </odoo>
